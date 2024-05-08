@@ -70,10 +70,17 @@ fn main() -> ! {
     // Init display
     let mut display = Display::new(channel_x, channel_y, -4., 4., -3., 3., &mut delay);
 
-    let lissajous = ParametricPath::new(0., 0.04, 2. * PI, 0, |t| {
-        (3.* libm::sinf(3. * t), 3. * libm::sinf(2. * t))
-    });
+    
+
+    let mut u = 0.;
+
     loop {
+        let lissajous = ParametricPath::new(0., 0.04, 2. * PI, 0, |t| {
+            (3.* libm::sinf(t + u), 3. * libm::sinf(2. * t))
+        });
+
         display.draw(&lissajous);
+
+        u += 0.05;
     }
 }
