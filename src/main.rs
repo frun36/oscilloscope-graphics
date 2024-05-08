@@ -1,16 +1,20 @@
 #![no_std]
 #![no_main]
 
+use core::f32::consts::PI;
+
+use drawable::parametric_path::ParametricPath;
 // Ensure we halt the program on panic
 use panic_halt as _;
 
+use hal::pac;
 use rp2040_hal as hal;
 use rp2040_hal::clocks::Clock;
-use hal::pac;
-
-use libm::{cosf, sinf};
 
 use display::Display;
+
+mod display;
+mod drawable;
 
 #[link_section = ".boot2"]
 #[used]
@@ -19,8 +23,6 @@ pub static BOOT2: [u8; 256] = rp2040_boot2::BOOT_LOADER_GENERIC_03H;
 const TOP: u16 = 1024;
 
 const XTAL_FREQ_HZ: u32 = 12_000_000u32;
-
-mod display;
 
 #[rp2040_hal::entry]
 fn main() -> ! {
@@ -66,17 +68,12 @@ fn main() -> ! {
     channel_y.output_to(pins.gpio3);
 
     // Init display
-    let mut display = Display::new(channel_x, channel_y, -4., 4., -3., 3.);
+    let mut display = Display::new(channel_x, channel_y, -4., 4., -3., 3., &mut delay);
 
-    let mut t = 0.0;
+    let lissajous = ParametricPath::new(0., 0.04, 2. * PI, 0, |t| {
+        (3.* libm::sinf(3. * t), 3. * libm::sinf(2. * t))
+    });
     loop {
-        let sin = sinf(t);
-        let (x, y) = (
-            2. * sin * sin * sin,
-            (13. * cosf(t) - 5. * cosf(2. * t) - 2. * cosf(3. * t)) * 0.125,
-        );
-        display.set_position(x, y).unwrap();
-        delay.delay_us(1);
-        t += 0.1;
+        display.draw(&lissajous);
     }
 }

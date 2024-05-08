@@ -1,11 +1,12 @@
 use core::convert::Infallible;
 
+use cortex_m::delay::Delay;
 use hal::pwm::{AnySlice, Channel, A, B};
 use rp2040_hal as hal;
 
 use embedded_hal::pwm::SetDutyCycle;
 
-use crate::TOP;
+use crate::{drawable::Drawable, TOP};
 
 pub struct Display<'a, S>
 where
@@ -17,6 +18,7 @@ where
     x_max: f32,
     y_min: f32,
     y_max: f32,
+    delay: &'a mut Delay,
 }
 
 impl<'a, S> Display<'a, S>
@@ -30,6 +32,7 @@ where
         x_max: f32,
         y_min: f32,
         y_max: f32,
+        delay: &'a mut Delay,
     ) -> Self {
         Self {
             pwm_channel_x,
@@ -38,6 +41,7 @@ where
             x_max,
             y_min,
             y_max,
+            delay,
         }
     }
 
@@ -56,8 +60,18 @@ where
     }
 
     pub fn set_position(&mut self, x: f32, y: f32) -> Result<(), Infallible> {
-        self.pwm_channel_x.set_duty_cycle(self.coord_to_x_duty_cycle(x))?;
-        self.pwm_channel_y.set_duty_cycle(self.coord_to_y_duty_cycle(y))?;
+        self.pwm_channel_x
+            .set_duty_cycle(self.coord_to_x_duty_cycle(x))?;
+        self.pwm_channel_y
+            .set_duty_cycle(self.coord_to_y_duty_cycle(y))?;
         Ok(())
+    }
+
+    pub fn draw<D: Drawable>(&mut self, img: &D) {
+        img.draw(self);
+    }
+
+    pub fn wait_us(&mut self, us: u32) {
+        self.delay.delay_us(us);
     }
 }
