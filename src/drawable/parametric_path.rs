@@ -36,7 +36,7 @@ where
         let mut t = self.t_0;
         while t <= self.t_1 {
             let (x, y) = (self.function)(t);
-            let _ = display.set_position(x, y);
+            display.set_position(x, y);
             display.wait_us(self.us);
             t += self.t_step;
         }

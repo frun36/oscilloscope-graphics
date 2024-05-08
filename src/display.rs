@@ -1,5 +1,3 @@
-use core::convert::Infallible;
-
 use cortex_m::delay::Delay;
 use hal::pwm::{AnySlice, Channel, A, B};
 use rp2040_hal as hal;
@@ -59,12 +57,13 @@ where
         (normalized * TOP as f32) as u16
     }
 
-    pub fn set_position(&mut self, x: f32, y: f32) -> Result<(), Infallible> {
-        self.pwm_channel_x
-            .set_duty_cycle(self.coord_to_x_duty_cycle(x))?;
-        self.pwm_channel_y
-            .set_duty_cycle(self.coord_to_y_duty_cycle(y))?;
-        Ok(())
+    pub fn set_position(&mut self, x: f32, y: f32) {
+        let _ = self
+            .pwm_channel_x
+            .set_duty_cycle(self.coord_to_x_duty_cycle(x));
+        let _ = self
+            .pwm_channel_y
+            .set_duty_cycle(self.coord_to_y_duty_cycle(y));
     }
 
     pub fn draw<D: Drawable>(&mut self, img: &D) {
