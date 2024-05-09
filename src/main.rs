@@ -70,19 +70,20 @@ fn main() -> ! {
     // Init display
     let mut display = Display::new(channel_x, channel_y, -4., 4., -3., 3., &mut delay);
 
-    
-
     let mut u = 0.;
 
     loop {
         // let lissajous = ParametricPath::new(0., 0.04, 2. * PI, 0, |t| {
         //     (3.* libm::sinf(t + u), 3. * libm::sinf(2. * t))
         // });
-
-        let circle = ParametricPath::circle((0., 0.), 2., 0.1, 1);
+        let arc = ParametricPath::arc((0., 0.), 2., 0., 0.1, PI, 1000, 1, 1000);
+        let seg_a = ParametricPath::segment((-2., 0.), (0., -2.), 0.1, 1000, 1, 1000);
+        let seg_b = ParametricPath::segment((0., -2.), (2., 0.), 0.1, 1000, 1, 1000);
 
         // display.draw(&lissajous);
-        display.draw(&circle);
+        display.draw(&arc);
+        display.draw(&seg_a);
+        display.draw(&seg_b);
 
         u += 0.05;
     }
