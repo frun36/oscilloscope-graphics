@@ -65,7 +65,7 @@ fn main() -> ! {
     channel_y.output_to(pins.gpio3);
 
     // Init display
-    let mut display = Display::new(channel_x, channel_y, -4., 4., -3., 3., &mut delay);
+    let mut display = Display::new(channel_x, channel_y, TOP, -4., 4., -3., 3., &mut delay);
 
     let mut u = 0.;
 
