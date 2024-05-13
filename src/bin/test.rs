@@ -3,7 +3,7 @@
 
 use core::f32::consts::PI;
 
-use drawable::parametric_path::ParametricPath;
+use oscilloscope_graphics::drawable::parametric_path::ParametricPath;
 // Ensure we halt the program on panic
 use panic_halt as _;
 
@@ -11,10 +11,7 @@ use hal::pac;
 use rp2040_hal as hal;
 use rp2040_hal::clocks::Clock;
 
-use display::Display;
-
-mod display;
-mod drawable;
+use oscilloscope_graphics::display::Display;
 
 #[link_section = ".boot2"]
 #[used]
@@ -73,17 +70,22 @@ fn main() -> ! {
     let mut u = 0.;
 
     loop {
-        // let lissajous = ParametricPath::new(0., 0.04, 2. * PI, 0, |t| {
-        //     (3.* libm::sinf(t + u), 3. * libm::sinf(2. * t))
-        // });
-        let arc = ParametricPath::arc((0., 0.), 2., 0., 0.1, PI, 1000, 1, 1000);
-        let seg_a = ParametricPath::segment((-2., 0.), (0., -2.), 0.1, 1000, 1, 1000);
-        let seg_b = ParametricPath::segment((0., -2.), (2., 0.), 0.1, 1000, 1, 1000);
+        for i in 0..4 {
+            let theta0 = 0.25 * PI * (2 * i) as f32 + u;
+            let theta1 = 0.25 * PI * (2 * i + 1) as f32 + u;
+            let (sin0, cos0) = libm::sincosf(theta0);
+            let (sin1, cos1) = libm::sincosf(theta1);
+            let seg0 =
+                ParametricPath::segment((0., 0.), (2. * cos0, 2. * sin0), 0.1, 1000, 1, 0);
+            let arc = 
+                ParametricPath::arc((0., 0.), 2., theta0, 0.1, theta1, 1000, 1, 0);
+            let seg1 =
+                ParametricPath::segment((2. * cos1, 2. * sin1), (0., 0.), -0.1, 1000, 1, 0);
 
-        // display.draw(&lissajous);
-        display.draw(&arc);
-        display.draw(&seg_a);
-        display.draw(&seg_b);
+            display.draw(&seg0);
+            display.draw(&arc);
+            display.draw(&seg1)
+        }
 
         u += 0.05;
     }

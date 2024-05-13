@@ -49,12 +49,20 @@ where
         display.wait_us(self.before_us);
 
         let mut t = self.t_0 + self.t_step;
-
-        while t <= self.t_1 {
-            let (x, y) = (self.function)(t);
-            display.set_position(x, y);
-            display.wait_us(self.us);
-            t += self.t_step;
+        if self.t_step.is_sign_positive() {
+            while t <= self.t_1 {
+                let (x, y) = (self.function)(t);
+                display.set_position(x, y);
+                display.wait_us(self.us);
+                t += self.t_step;
+            }
+        } else {
+            while t >= self.t_1 {
+                let (x, y) = (self.function)(t);
+                display.set_position(x, y);
+                display.wait_us(self.us);
+                t += self.t_step;
+            }
         }
 
         display.wait_us(self.after_us);
@@ -74,7 +82,7 @@ impl ParametricPath<fn(f32) -> (f32, f32)> {
     ) -> ParametricPath<impl Fn(f32) -> (f32, f32)> {
         let f = move |t| {
             let (y, x) = libm::sincosf(t);
-            (r * (x - o.0), r * (y - o.1))
+            (r * (x + o.0), r * (y + o.1))
         };
         ParametricPath {
             t_0,
@@ -106,10 +114,8 @@ impl ParametricPath<fn(f32) -> (f32, f32)> {
         us: u32,
         after_us: u32,
     ) -> ParametricPath<impl Fn(f32) -> (f32, f32)> {
-        let function = move |t| {
-            (a.0 + t * (b.0 - a.0), a.1 + t * (b.1 - a.1))
-        };
-        
+        let function = move |t| (a.0 + t * (b.0 - a.0), a.1 + t * (b.1 - a.1));
+
         ParametricPath {
             t_0: 0.,
             t_step,
@@ -117,7 +123,7 @@ impl ParametricPath<fn(f32) -> (f32, f32)> {
             before_us,
             us,
             after_us,
-            function
+            function,
         }
     }
 }
