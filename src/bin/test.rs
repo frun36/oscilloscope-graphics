@@ -48,7 +48,7 @@ fn main() -> ! {
     let mut adc = Adc::new(peripherals.ADC, &mut peripherals.RESETS);
     let mut pot = AdcPin::new(pins.gpio26.into_floating_input()).unwrap();
 
-    let mut adc_fifo = adc
+    let adc_fifo = adc
         .build_fifo()
         .clock_divider(0, 0) // sample as fast as possible (500ksps)
         .set_channel(&mut pot)
@@ -69,7 +69,9 @@ fn main() -> ! {
     channel_y.output_to(pins.gpio3);
 
     // Init display
-    let mut display = Display::new(channel_x, channel_y, TOP, -4., 4., -3., 3., &mut delay);
+    let mut display = Display::new(
+        channel_x, channel_y, TOP, -4., 4., -3., 3., &mut delay, adc_fifo,
+    );
 
     let mut u = 0.;
     let mut r = 2.;
@@ -93,11 +95,8 @@ fn main() -> ! {
 
         u += 0.05;
 
-        if adc_fifo.len() > 0 {
-            let adc_counts: u16 = adc_fifo.read();
-            r = 1.5 + adc_counts as f32 / 4096.;
+        if let Some(x) = display.read_knob() {
+            r = 1. + 2. * x;
         }
-
-        watchdog.feed();
     }
 }

@@ -1,5 +1,5 @@
 use cortex_m::delay::Delay;
-use rp_pico::hal::pwm::{AnySlice, Channel, A, B};
+use rp_pico::hal::{adc::AdcFifo, pwm::{AnySlice, Channel, A, B}};
 
 use embedded_hal::pwm::SetDutyCycle;
 
@@ -19,6 +19,7 @@ where
     y_max: f32,
     y_size: f32,
     delay: &'a mut Delay,
+    adc_fifo: AdcFifo<'a, u16>,
 }
 
 impl<'a, S> Display<'a, S>
@@ -34,6 +35,7 @@ where
         y_min: f32,
         y_max: f32,
         delay: &'a mut Delay,
+        adc_fifo: AdcFifo<'a, u16>,
     ) -> Self {
         Self {
             pwm_channel_x,
@@ -46,6 +48,7 @@ where
             y_max,
             y_size: y_max - y_min,
             delay,
+            adc_fifo,
         }
     }
 
@@ -78,5 +81,14 @@ where
 
     pub fn wait_us(&mut self, us: u32) {
         self.delay.delay_us(us);
+    }
+
+    pub fn read_knob(&mut self) -> Option<f32> {
+        if self.adc_fifo.len() > 0 {
+            let adc_counts: u16 = self.adc_fifo.read();
+            Some(adc_counts as f32 / 4096.)
+        } else {
+            None
+        }
     }
 }
