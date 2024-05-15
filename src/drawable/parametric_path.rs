@@ -1,6 +1,6 @@
 use core::f32::consts::PI;
 
-use rp2040_hal::pwm::AnySlice;
+use rp_pico::hal::pwm::AnySlice;
 
 use super::Drawable;
 

@@ -1,4 +1,4 @@
-use rp2040_hal::pwm::AnySlice;
+use rp_pico::hal::pwm::AnySlice;
 
 use crate::display::Display;
 

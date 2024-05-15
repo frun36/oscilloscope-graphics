@@ -1,6 +1,5 @@
 use cortex_m::delay::Delay;
-use hal::pwm::{AnySlice, Channel, A, B};
-use rp2040_hal as hal;
+use rp_pico::hal::pwm::{AnySlice, Channel, A, B};
 
 use embedded_hal::pwm::SetDutyCycle;
 
