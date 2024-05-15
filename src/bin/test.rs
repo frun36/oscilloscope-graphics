@@ -13,7 +13,7 @@ use rp_pico::hal::{self, adc::AdcPin, clocks::Clock, pac, Adc};
 use oscilloscope_graphics::display::Display;
 use oscilloscope_graphics::drawable::parametric_path::ParametricPath;
 
-const TOP: u16 = 1024;
+const TOP: u16 = 255;
 
 #[rp_pico::entry]
 fn main() -> ! {
@@ -59,6 +59,7 @@ fn main() -> ! {
 
     let pwm = &mut pwm_slices.pwm1;
     pwm.set_ph_correct();
+    // pwm.clr_ph_correct();
     pwm.set_top(TOP);
     pwm.enable();
 
@@ -75,28 +76,37 @@ fn main() -> ! {
 
     let mut u = 0.;
     let mut r = 2.;
+    let mut du = 0.;
 
     info!("Hellou");
 
     loop {
-        for i in 0..4 {
-            let theta0 = 0.25 * PI * (2 * i) as f32 + u;
-            let theta1 = 0.25 * PI * (2 * i + 1) as f32 + u;
-            let (sin0, cos0) = libm::sincosf(theta0);
-            let (sin1, cos1) = libm::sincosf(theta1);
-            let seg0 = ParametricPath::segment((0., 0.), (r * cos0, r * sin0), 0.1, 1000, 1, 0);
-            let arc = ParametricPath::arc((0., 0.), r, theta0, 0.1, theta1, 1000, 1, 0);
-            let seg1 = ParametricPath::segment((r * cos1, r * sin1), (0., 0.), -0.1, 1000, 1, 0);
+        // for i in 0..4 {
+        //     let theta0 = 0.25 * PI * (2 * i) as f32 - u;
+        //     let theta1 = 0.25 * PI * (2 * i + 1) as f32 - u;
+        //     let (sin0, cos0) = libm::sincosf(theta0);
+        //     let (sin1, cos1) = libm::sincosf(theta1);
+        //     let seg0 = ParametricPath::segment((0., 0.), (r * cos0, r * sin0), 0.1, 1000, 1, 0);
+        //     let arc = ParametricPath::arc((0., 0.), r, theta0, 0.1, theta1, 1000, 1, 0);
+        //     let seg1 = ParametricPath::segment((r * cos1, r * sin1), (0., 0.), -0.1, 1000, 1, 0);
 
-            display.draw(&seg0);
-            display.draw(&arc);
-            display.draw(&seg1);
-        }
+        //     display.draw(&seg0);
+        //     display.draw(&arc);
+        //     display.draw(&seg1);
+        // }
 
-        u += 0.05;
+        let circ0 = ParametricPath::circle((-2., 0.), 1., 0.1, 500, 1, 500);
+        let circ1 = ParametricPath::circle((2., 0.), 1., 0.1, 500, 1, 500);
+
+        display.draw(&circ0);
+        display.draw(&circ1);
+
+        // u += 0.05;
 
         if let Some(x) = display.read_knob() {
-            r = 1. + 2. * x;
+            // r = 1. + 2. * x;
+            du = x * 0.25;
         }
+        u += du;
     }
 }
