@@ -11,7 +11,7 @@ use defmt_rtt as _;
 use rp_pico::hal::{self, adc::AdcPin, clocks::Clock, pac, Adc};
 
 use oscilloscope_graphics::display::Display;
-use oscilloscope_graphics::drawable::parametric_path::ParametricPath;
+use oscilloscope_graphics::drawable::parametric::Parametric;
 
 const TOP: u16 = 255;
 
@@ -81,25 +81,27 @@ fn main() -> ! {
     info!("Hellou");
 
     loop {
-        // for i in 0..4 {
-        //     let theta0 = 0.25 * PI * (2 * i) as f32 - u;
-        //     let theta1 = 0.25 * PI * (2 * i + 1) as f32 - u;
-        //     let (sin0, cos0) = libm::sincosf(theta0);
-        //     let (sin1, cos1) = libm::sincosf(theta1);
-        //     let seg0 = ParametricPath::segment((0., 0.), (r * cos0, r * sin0), 0.1, 1000, 1, 0);
-        //     let arc = ParametricPath::arc((0., 0.), r, theta0, 0.1, theta1, 1000, 1, 0);
-        //     let seg1 = ParametricPath::segment((r * cos1, r * sin1), (0., 0.), -0.1, 1000, 1, 0);
+        for i in 0..4 {
+            let theta0 = 0.25 * PI * (2 * i) as f32 - u;
+            let theta1 = 0.25 * PI * (2 * i + 1) as f32 - u;
+            let (sin0, cos0) = libm::sincosf(theta0);
+            let (sin1, cos1) = libm::sincosf(theta1);
+            let seg0 = Parametric::segment((0., 0.), (r * cos0, r * sin0), 0.1, 300, 1, 0);
+            let arc = Parametric::arc((0., 0.), r, theta0, 0.1, theta1, 250, 1, 0);
+            let seg1 = Parametric::segment((r * cos1, r * sin1), (0., 0.), -0.1, 300, 1, 0);
 
-        //     display.draw(&seg0);
-        //     display.draw(&arc);
-        //     display.draw(&seg1);
-        // }
+            display.draw(&seg0);
+            display.draw(&arc);
+            display.draw(&seg1);
+        }
 
-        let circ0 = ParametricPath::circle((-2., 0.), 1., 0.1, 500, 1, 500);
-        let circ1 = ParametricPath::circle((2., 0.), 1., 0.1, 500, 1, 500);
+        // let circ0 = Parametric::circle((-2., 0.), 1., 0.1, 500, 1, 500);
+        // let circ1 = Parametric::circle((2., 0.), 1., 0.1, 500, 1, 500);
+        // let point = Parametric::point((0., 2.), 1000);
 
-        display.draw(&circ0);
-        display.draw(&circ1);
+        // display.draw(&circ0);
+        // display.draw(&circ1);
+        // display.draw(&point);
 
         // u += 0.05;
 

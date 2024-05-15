@@ -4,7 +4,7 @@ use rp_pico::hal::pwm::AnySlice;
 
 use super::Drawable;
 
-pub struct ParametricPath<F> {
+pub struct Parametric<F> {
     t_0: f32,
     t_step: f32,
     t_1: f32,
@@ -14,11 +14,11 @@ pub struct ParametricPath<F> {
     function: F,
 }
 
-impl<F> ParametricPath<F>
+impl<F> Parametric<F>
 where
     F: Fn(f32) -> (f32, f32),
 {
-    pub fn new(
+    pub fn path(
         t_0: f32,
         t_step: f32,
         t_1: f32,
@@ -39,7 +39,7 @@ where
     }
 }
 
-impl<F> Drawable for ParametricPath<F>
+impl<F> Drawable for Parametric<F>
 where
     F: Fn(f32) -> (f32, f32),
 {
@@ -69,7 +69,7 @@ where
     }
 }
 
-impl ParametricPath<fn(f32) -> (f32, f32)> {
+impl Parametric<fn(f32) -> (f32, f32)> {
     pub fn arc(
         o: (f32, f32),
         r: f32,
@@ -79,12 +79,12 @@ impl ParametricPath<fn(f32) -> (f32, f32)> {
         before_us: u32,
         us: u32,
         after_us: u32,
-    ) -> ParametricPath<impl Fn(f32) -> (f32, f32)> {
+    ) -> Parametric<impl Fn(f32) -> (f32, f32)> {
         let f = move |t| {
             let (y, x) = libm::sincosf(t);
             (r * (x + o.0), r * (y + o.1))
         };
-        ParametricPath {
+        Parametric {
             t_0,
             t_step,
             t_1,
@@ -102,7 +102,7 @@ impl ParametricPath<fn(f32) -> (f32, f32)> {
         before_us: u32,
         us: u32,
         after_us: u32,
-    ) -> ParametricPath<impl Fn(f32) -> (f32, f32)> {
+    ) -> Parametric<impl Fn(f32) -> (f32, f32)> {
         Self::arc(o, r, 0., t_step, 2. * PI, before_us, us, after_us)
     }
 
@@ -113,10 +113,10 @@ impl ParametricPath<fn(f32) -> (f32, f32)> {
         before_us: u32,
         us: u32,
         after_us: u32,
-    ) -> ParametricPath<impl Fn(f32) -> (f32, f32)> {
+    ) -> Parametric<impl Fn(f32) -> (f32, f32)> {
         let function = move |t| (a.0 + t * (b.0 - a.0), a.1 + t * (b.1 - a.1));
 
-        ParametricPath {
+        Parametric {
             t_0: 0.,
             t_step,
             t_1: 1.,
@@ -124,6 +124,20 @@ impl ParametricPath<fn(f32) -> (f32, f32)> {
             us,
             after_us,
             function,
+        }
+    }
+
+    pub fn point(p: (f32, f32), us: u32) -> Parametric<impl Fn(f32) -> (f32, f32)> {
+        let function = move |_t| (p.0, p.1);
+
+        Parametric {
+            t_0: 0.,
+            t_step: 1.,
+            t_1: 0.,
+            before_us: us,
+            us: 0,
+            after_us: 0,
+            function
         }
     }
 }
