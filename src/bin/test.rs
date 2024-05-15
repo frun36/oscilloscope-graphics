@@ -7,6 +7,9 @@ use panic_halt as _;
 
 use rp_pico::hal::{self, clocks::Clock, pac};
 
+use defmt_rtt as _;
+use defmt::info;
+
 use oscilloscope_graphics::display::Display;
 use oscilloscope_graphics::drawable::parametric_path::ParametricPath;
 
@@ -59,6 +62,8 @@ fn main() -> ! {
     let mut display = Display::new(channel_x, channel_y, TOP, -4., 4., -3., 3., &mut delay);
 
     let mut u = 0.;
+
+    info!("Hellou");
 
     loop {
         for i in 0..4 {

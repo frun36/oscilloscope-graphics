@@ -1,6 +1,6 @@
 [target.'cfg(all(target_arch = "arm", target_os = "none"))']
-runner = "elf2uf2-rs -d"
-# runner = "python3 release.py"
+# runner = "elf2uf2-rs -d"
+runner = "probe-rs run --chip RP2040 --protocol swd"
 
 rustflags = [
  "-C", "linker=flip-link",
