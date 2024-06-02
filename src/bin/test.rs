@@ -13,8 +13,6 @@ use rp_pico::hal::{self, adc::AdcPin, clocks::Clock, pac, Adc};
 use oscilloscope_graphics::display::Display;
 use oscilloscope_graphics::drawable::parametric::Parametric;
 
-const TOP: u16 = 255;
-
 #[rp_pico::entry]
 fn main() -> ! {
     let mut peripherals = pac::Peripherals::take().unwrap();
@@ -60,7 +58,7 @@ fn main() -> ! {
     let pwm = &mut pwm_slices.pwm1;
     pwm.set_ph_correct();
     // pwm.clr_ph_correct();
-    pwm.set_top(TOP);
+    pwm.set_top(oscilloscope_graphics::TOP);
     pwm.enable();
 
     let channel_x = &mut pwm.channel_a;
@@ -70,9 +68,7 @@ fn main() -> ! {
     channel_y.output_to(pins.gpio3);
 
     // Init display
-    let mut display = Display::new(
-        channel_x, channel_y, TOP, -4., 4., -3., 3., &mut delay, adc_fifo,
-    );
+    let mut display = Display::new(channel_x, channel_y, &mut delay, adc_fifo);
 
     let mut u = 0.;
     let mut r = 2.;
