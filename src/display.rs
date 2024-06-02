@@ -47,11 +47,7 @@ where
         (bits as i16 + 128) as u16
     }
 
-    pub fn set_position(&mut self, x: f32, y: f32) {
-        let (x, y) = (
-            Coordinate::saturating_from_num(x),
-            Coordinate::saturating_from_num(y),
-        );
+    pub fn set_position(&mut self, x: Coordinate, y: Coordinate) {
         let _ = self
             .pwm_channel_x
             .set_duty_cycle(self.coord_to_x_duty_cycle(x));

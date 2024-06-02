@@ -16,6 +16,7 @@ libm = "0.2.8"
 rp-pico = "0.9.0"
 panic-probe = { version = "0.3.2", features = ["print-defmt"] }
 fixed = "1.27.0"
+cordic = "0.1.5"
 
 
 # cargo build/run

@@ -3,6 +3,7 @@
 
 use core::f32::consts::PI;
 
+use oscilloscope_graphics::{Coordinate, Parameter};
 use panic_probe as _;
 
 use defmt::info;
@@ -70,26 +71,26 @@ fn main() -> ! {
     // Init display
     let mut display = Display::new(channel_x, channel_y, &mut delay, adc_fifo);
 
-    let mut u = 0.;
-    let mut r = 2.;
-    let mut du = 0.;
+    // let mut u = 0.;
+    // let mut r = 2.;
+    // let mut du = 0.;
 
     info!("Hellou");
 
     loop {
-        for i in 0..4 {
-            let theta0 = 0.25 * PI * (2 * i) as f32 - u;
-            let theta1 = 0.25 * PI * (2 * i + 1) as f32 - u;
-            let (sin0, cos0) = libm::sincosf(theta0);
-            let (sin1, cos1) = libm::sincosf(theta1);
-            let seg0 = Parametric::segment((0., 0.), (r * cos0, r * sin0), 0.1, 300, 1, 0);
-            let arc = Parametric::arc((0., 0.), r, theta0, 0.1, theta1, 250, 1, 0);
-            let seg1 = Parametric::segment((r * cos1, r * sin1), (0., 0.), -0.1, 300, 1, 0);
+        // for i in 0..4 {
+        //     let theta0 = 0.25 * PI * (2 * i) as f32 - u;
+        //     let theta1 = 0.25 * PI * (2 * i + 1) as f32 - u;
+        //     let (sin0, cos0) = libm::sincosf(theta0);
+        //     let (sin1, cos1) = libm::sincosf(theta1);
+        //     let seg0 = Parametric::segment((0., 0.), (r * cos0, r * sin0), 0.1, 300, 1, 0);
+        //     let arc = Parametric::arc((0., 0.), r, theta0, 0.1, theta1, 250, 1, 0);
+        //     let seg1 = Parametric::segment((r * cos1, r * sin1), (0., 0.), -0.1, 300, 1, 0);
 
-            display.draw(&seg0);
-            display.draw(&arc);
-            display.draw(&seg1);
-        }
+        //     display.draw(&seg0);
+        //     display.draw(&arc);
+        //     display.draw(&seg1);
+        // }
 
         // let circ0 = Parametric::circle((-2., 0.), 1., 0.1, 500, 1, 500);
         // let circ1 = Parametric::circle((2., 0.), 1., 0.1, 500, 1, 500);
@@ -99,12 +100,23 @@ fn main() -> ! {
         // display.draw(&circ1);
         // display.draw(&point);
 
+        let circ = Parametric::circle(
+            (Coordinate::from_num(0), Coordinate::from_num(0)),
+            Coordinate::from_num(2),
+            Parameter::from_num(0.1),
+            0,
+            1,
+            0,
+        );
+
+        display.draw(&circ);
+
         // u += 0.05;
 
-        if let Some(x) = display.read_knob() {
-            // r = 1. + 2. * x;
-            du = x * 0.25;
-        }
-        u += du;
+        // if let Some(x) = display.read_knob() {
+        //     // r = 1. + 2. * x;
+        //     du = x * 0.25;
+        // }
+        // u += du;
     }
 }
